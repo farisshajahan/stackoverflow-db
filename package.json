@@ -2,9 +2,14 @@
   "name": "stackoverflow-db",
   "version": "1.0.0",
   "description": "",
+  "type": "module",
+  "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
-    "start:dev": "nodemon src/index.js"
+    "start:dev": "nodemon src/index.js",
+    "lint": "eslint src/ --ext .js,.cjs,.mjs",
+    "lint:fix": "eslint src/ --ext .js,.cjs,.mjs --fix",
+    "prepare": "husky install"
   },
   "repository": {
     "type": "git",
@@ -17,6 +22,18 @@
   },
   "homepage": "https://github.com/farisshajahan/stackoverflow-db#readme",
   "devDependencies": {
+    "eslint": "^8.9.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^8.4.0",
+    "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-prettier": "^4.0.0",
+    "husky": "^7.0.4",
+    "lint-staged": "^12.3.4",
     "nodemon": "^2.0.15"
+  },
+  "lint-staged": {
+    "src/**/*.{js,cjs,mjs}": [
+      "eslint src/ --ext .js,.cjs,.mjs"
+    ]
   }
 }
