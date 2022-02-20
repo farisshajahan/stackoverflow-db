@@ -5,8 +5,8 @@
   "type": "module",
   "main": "src/index.js",
   "scripts": {
-    "start": "node src/index.js",
-    "start:dev": "nodemon src/index.js",
+    "start": "node --experimental-specifier-resolution=node src/index.js",
+    "start:dev": "nodemon --experimental-specifier-resolution=node src/index.js",
     "lint": "eslint src/ --ext .js,.cjs,.mjs",
     "lint:fix": "eslint src/ --ext .js,.cjs,.mjs --fix",
     "prepare": "husky install"
@@ -35,5 +35,12 @@
     "src/**/*.{js,cjs,mjs}": [
       "eslint src/ --ext .js,.cjs,.mjs"
     ]
+  },
+  "dependencies": {
+    "dotenv": "^16.0.0",
+    "fastify": "^3.27.2",
+    "knex": "^1.0.3",
+    "objection": "^3.0.1",
+    "pg": "^8.7.3"
   }
 }
