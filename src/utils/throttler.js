@@ -1,6 +1,6 @@
 const throttler = (maxCallsPerInterval, intervalTime) => {
   let numRunning = 0;
-  let startTime = Date.now();
+  let startTime = 0;
   const queue = [];
   let schedulerRunning = false;
 
@@ -14,18 +14,21 @@ const throttler = (maxCallsPerInterval, intervalTime) => {
   const runScheduler = async () => {
     schedulerRunning = true;
     const now = Date.now();
-    if (queue.length || now < intervalTime + startTime) {
+    if (queue.length) {
       if (now > intervalTime + startTime) {
         numRunning = 0;
-        startTime = Date.now();
+        startTime = now;
       }
+      if (!numRunning) startTime = now;
       if (numRunning < maxCallsPerInterval) dequeue();
-      else setTimeout(runScheduler, (intervalTime + startTime - now + 1) * 1000);
+      setTimeout(runScheduler, (intervalTime + startTime - now + 1) * 1000);
+      return;
     }
+    numRunning = 0;
     schedulerRunning = false;
   };
 
-  const enqueue = async (callback) =>
+  const enqueue = (callback) =>
     new Promise((resolve, reject) => {
       const promise = () => Promise.resolve().then(callback).then(resolve).catch(reject);
       queue.push(promise);
@@ -33,6 +36,7 @@ const throttler = (maxCallsPerInterval, intervalTime) => {
         startTime = Date.now();
         runScheduler();
       }
+      dequeue();
     });
 
   return enqueue;
