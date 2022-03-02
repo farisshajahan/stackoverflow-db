@@ -51,6 +51,7 @@ const Crawler = () => {
 
   const run = async () => {
     if (crawlerRunning) return;
+    stopSignal = false;
     crawlerRunning = true;
     const response = await axios.get('https://stackoverflow.com/questions');
     let lastPageNum = getLastPageNumber(response.data);
