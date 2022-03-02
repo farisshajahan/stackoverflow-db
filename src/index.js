@@ -1,6 +1,12 @@
 import 'dotenv/config';
 import Fastify from 'fastify';
+import Knex from 'knex';
+import { Model } from 'objection';
+import knexConfig from '../knexfile.cjs';
 import routes from './routes';
+
+const knex = Knex(knexConfig[process.env.NODE_ENV]);
+Model.knex(knex);
 
 const fastify = Fastify({ logger: true });
 

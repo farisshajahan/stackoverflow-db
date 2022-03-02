@@ -25,6 +25,19 @@ class Question extends Model {
       },
     };
   }
+
+  static addQuestionToDatabase = async (questionObj) => {
+    await Question.query().insert(questionObj);
+  };
+
+  static incrementRefCount = async (qId) => {
+    const entry = await Question.query().where('q_id', qId);
+    if (entry.length) {
+      await Question.query().increment('ref_count', 1).where('q_id', qId);
+    } else {
+      await Question.addQuestionToDatabase({ refCount: 1, qId });
+    }
+  };
 }
 
 export default Question;
