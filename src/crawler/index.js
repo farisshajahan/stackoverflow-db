@@ -14,7 +14,7 @@ const Crawler = () => {
   let stopSignal = false;
   let crawlerRunning = false;
   const throttlerObj = throttler(5, 10);
-  const logger = Pino({ name: 'CRAWLER' });
+  const logger = Pino({ name: 'crawler' });
 
   const processQuestion = async (question) => {
     const { questionObj, questionUrl } = await getQuestionMetadata(question);
