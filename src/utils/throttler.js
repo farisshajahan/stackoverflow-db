@@ -1,13 +1,16 @@
 const throttler = (maxCallsPerInterval, intervalTime) => {
   let numRunning = 0;
+  let callsInThisInterval = 0;
   let startTime = 0;
   const queue = [];
   let schedulerRunning = false;
+  let abortSignal = false;
 
   const dequeue = async () => {
     queue.splice(0, maxCallsPerInterval - numRunning).forEach((fn) => {
       numRunning += 1;
-      fn();
+      callsInThisInterval += 1;
+      fn(abortSignal);
     });
   };
 
@@ -16,11 +19,13 @@ const throttler = (maxCallsPerInterval, intervalTime) => {
     const now = Date.now();
     if (queue.length) {
       if (now > intervalTime + startTime) {
-        numRunning = 0;
+        callsInThisInterval = 0;
         startTime = now;
       }
-      if (!numRunning) startTime = now;
-      if (numRunning < maxCallsPerInterval) dequeue();
+      if (!callsInThisInterval) startTime = now;
+      if (callsInThisInterval < maxCallsPerInterval) {
+        dequeue();
+      }
       setTimeout(runScheduler, (intervalTime + startTime - now + 1) * 1000);
       return;
     }
@@ -28,9 +33,20 @@ const throttler = (maxCallsPerInterval, intervalTime) => {
     schedulerRunning = false;
   };
 
-  const enqueue = (callback) =>
-    new Promise((resolve, reject) => {
-      const promise = () => Promise.resolve().then(callback).then(resolve).catch(reject);
+  const enqueue = (fn) => {
+    abortSignal = false;
+    return new Promise((resolve, reject) => {
+      const promise = (abort) => {
+        if (!abort)
+          Promise.resolve()
+            .then(fn)
+            .then(resolve)
+            .catch(reject)
+            .finally(() => {
+              numRunning -= 1;
+            });
+        else reject();
+      };
       queue.push(promise);
       if (!schedulerRunning) {
         startTime = Date.now();
@@ -38,8 +54,16 @@ const throttler = (maxCallsPerInterval, intervalTime) => {
       }
       dequeue();
     });
+  };
 
-  return enqueue;
+  const clearQueue = () => {
+    abortSignal = true;
+    queue.splice(0, queue.length).forEach((fn) => fn(abortSignal));
+    numRunning = 0;
+    callsInThisInterval = 0;
+  };
+
+  return { enqueue, clearQueue };
 };
 
 export default throttler;
