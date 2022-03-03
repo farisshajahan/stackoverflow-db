@@ -12,13 +12,19 @@ class Checkpoint extends Model {
   static get jsonSchema() {
     return {
       type: 'object',
-      required: ['qNumber'],
+      required: ['pageCount'],
 
       properties: {
-        qNumber: { type: 'integer' },
+        pageCount: { type: 'integer' },
       },
     };
   }
+
+  static updatePageCount = async (pageCount) => {
+    await Checkpoint.query().findById(1).patch({ pageCount });
+  };
+
+  static getPageCount = async () => (await Checkpoint.query().findById(1)).pageCount;
 }
 
 export default Checkpoint;

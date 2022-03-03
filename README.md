@@ -52,15 +52,21 @@ The app is now running at
 
 ### Start the script
 
-Making a GET request to the /start endpoint starts the crawler in the background
+Make a GET request to the /start endpoint to start the crawler in the background
 
 `curl -X GET http://localhost:6000/start`
 
 ### Kill/Stop the script
 
-Making a GET request to the /stop endpoint stops the running crawler
+Make a GET request to the /stop endpoint to stop the running crawler
 
 `curl -X GET http://localhost:6000/stop`
+
+### Resume the script from last saved checkpoint
+
+Make a GET request to the /resume endpoint to resume the crawler
+
+`curl -X GET http://localhost:6000/resume`
 
 ## Contributing
 

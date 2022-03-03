@@ -7,7 +7,21 @@ const routes = (fastify, opt, next) => {
   fastify.get('/start', (request, reply) => {
     if (!crawlerRunning) {
       crawlerRunning = true;
-      crawler.run().finally(() => {
+      crawler.run(false).finally(() => {
+        crawlerRunning = false;
+      });
+      reply.status(202).send();
+    } else
+      reply
+        .status(200)
+        .header('Content-Type', 'application/json; charset=utf-8')
+        .send({ message: 'Already running' });
+  });
+
+  fastify.get('/resume', (request, reply) => {
+    if (!crawlerRunning) {
+      crawlerRunning = true;
+      crawler.run(true).finally(() => {
         crawlerRunning = false;
       });
       reply.status(202).send();

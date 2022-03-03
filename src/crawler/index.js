@@ -49,22 +49,21 @@ const Crawler = () => {
     await Promise.all(questionPromises).catch(() => logger.warn('Question promises rejected'));
   };
 
-  const run = async () => {
+  const run = async (resume) => {
     if (crawlerRunning) return;
     stopSignal = false;
     crawlerRunning = true;
     const response = await axios.get('https://stackoverflow.com/questions');
-    let lastPageNum = getLastPageNumber(response.data);
-    lastPageNum = 2;
+    let lastPageNum = getLastPageNumber(response.data) - 20;
+    if (resume) lastPageNum -= await Checkpoint.getPageCount();
+    else await Question.query().delete();
     let currPageNum;
     for (currPageNum = lastPageNum; currPageNum >= 1; currPageNum -= 1) {
       if (stopSignal) break;
       /* eslint-disable no-await-in-loop */
       await fetchAndParsePage(currPageNum);
     }
-    await Checkpoint.query()
-      .patch({ q_number: (lastPageNum - currPageNum - 1) * 50 })
-      .where('id', 1);
+    await Checkpoint.updatePageCount(lastPageNum - currPageNum - 1);
     stopSignal = false;
     crawlerRunning = false;
   };

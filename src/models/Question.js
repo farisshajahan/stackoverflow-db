@@ -27,7 +27,9 @@ class Question extends Model {
   }
 
   static addQuestionToDatabase = async (questionObj) => {
-    await Question.query().insert(questionObj);
+    if ((await Question.query().where('q_id', questionObj.qId)).length) {
+      await Question.query().patch(questionObj).where('q_id', questionObj.qId);
+    } else await Question.query().insert(questionObj);
   };
 
   static incrementRefCount = async (qId) => {
